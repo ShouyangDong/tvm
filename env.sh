@@ -1,0 +1,3 @@
+export TVM_HOME="$PYTHONPATH:$PWD"
+export PYTHONPATH=$TVM_HOME/python:${PYTHONPATH}
+ulimit -n 65535
