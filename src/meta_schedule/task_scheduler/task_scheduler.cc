@@ -17,7 +17,8 @@
  * under the License.
  */
 #include "../utils.h"
-
+#include <iostream>
+#include <chrono>
 namespace tvm {
 namespace meta_schedule {
 
@@ -141,7 +142,7 @@ void TaskCleanUp(TaskRecordNode* self, int task_id, const Array<RunnerResult>& r
 }
 
 void TaskSchedulerNode::Tune(Array<TuneContext> ctxs, Array<FloatImm> task_weights,
-                             int max_trials_global, int max_trials_per_task,
+                             int tuning_time, int max_trials_global, int max_trials_per_task,
                              int num_trials_per_iter, Builder builder, Runner runner,
                              Array<MeasureCallback> measure_callbacks, Optional<Database> database,
                              Optional<CostModel> cost_model) {
@@ -176,7 +177,15 @@ void TaskSchedulerNode::Tune(Array<TuneContext> ctxs, Array<FloatImm> task_weigh
   }
 
   int num_trials_already = 0;
-  for (int task_id; num_trials_already < max_trials_global && (task_id = NextTaskId()) != -1;) {
+  double start_time_ = std::chrono::duration_cast<std::chrono::seconds>(
+    std::chrono::system_clock::now().time_since_epoch()
+  ).count();
+  //for (int task_id; num_trials_already < max_trials_global && (task_id = NextTaskId()) != -1;) {
+  for (int task_id;
+     num_trials_already < max_trials_global &&
+     (task_id = NextTaskId()) != -1 &&
+     (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count() - start_time_) < tuning_time;
+  ) {
     TVM_PY_LOG(INFO, this->logger)
         << "TaskScheduler picks Task #" << task_id << ": " << tasks_[task_id]->ctx->task_name;
     TaskRecordNode* task = tasks_[task_id].get();
@@ -346,17 +355,17 @@ Array<RunnerResult> PyTaskSchedulerNode::JoinRunningTask(int task_id) {
   }
 }
 
-void PyTaskSchedulerNode::Tune(Array<TuneContext> tasks, Array<FloatImm> task_weights,
+void PyTaskSchedulerNode::Tune(Array<TuneContext> tasks, Array<FloatImm> task_weights, int tuning_time,
                                int max_trials_global, int max_trials_per_task,
                                int num_trials_per_iter, Builder builder, Runner runner,
                                Array<MeasureCallback> measure_callbacks,
                                Optional<Database> database, Optional<CostModel> cost_model) {
   if (f_tune == nullptr) {
-    TaskSchedulerNode::Tune(tasks, task_weights, max_trials_global, max_trials_per_task,
+    TaskSchedulerNode::Tune(tasks, task_weights, tuning_time, max_trials_global, max_trials_per_task,
                             num_trials_per_iter, builder, runner, measure_callbacks, database,
                             cost_model);
   } else {
-    f_tune(tasks, task_weights, max_trials_global, max_trials_per_task, num_trials_per_iter,
+    f_tune(tasks, task_weights, tuning_time, max_trials_global, max_trials_per_task, num_trials_per_iter,
            builder, runner, measure_callbacks, database, cost_model);
   }
 }

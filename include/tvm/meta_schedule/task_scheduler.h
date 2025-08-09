@@ -167,6 +167,7 @@ class TaskSchedulerNode : public runtime::Object {
    * \brief Jointly tune a given list of tasks.
    * \param tasks The tasks to be tuned
    * \param task_weights The weight of each task
+   * \param tuning_time The time of tuning
    * \param max_trials_global The maximum number of trials to be performed globally
    * \param max_trials_per_task The maximum number of trials to be performed for each task
    * \param num_trials_per_iter The number of trials to be performed in each iteration
@@ -178,6 +179,7 @@ class TaskSchedulerNode : public runtime::Object {
    */
   virtual void Tune(Array<TuneContext> tasks,                  //
                     Array<FloatImm> task_weights,              //
+		    int tuning_time,                           //
                     int max_trials_global,                     //
                     int max_trials_per_task,                   //
                     int num_trials_per_iter,                   //
@@ -221,6 +223,7 @@ class PyTaskSchedulerNode : public TaskSchedulerNode {
   /*! \brief The function type of `Tune` method. */
   using FTune = runtime::TypedPackedFunc<void(Array<TuneContext> tasks,                  //
                                               Array<FloatImm> task_weights,              //
+					      int tuning_time,                           //
                                               int max_trials_global,                     //
                                               int max_trials_per_task,                   //
                                               int num_trials_per_iter,                   //
@@ -246,7 +249,7 @@ class PyTaskSchedulerNode : public TaskSchedulerNode {
 
   int NextTaskId() final;
   Array<RunnerResult> JoinRunningTask(int task_id) final;
-  void Tune(Array<TuneContext> tasks, Array<FloatImm> task_weights, int max_trials_global,
+  void Tune(Array<TuneContext> tasks, Array<FloatImm> task_weights, int tuning_time, int max_trials_global,
             int max_trials_per_task, int num_trials_per_iter, Builder builder, Runner runner,
             Array<MeasureCallback> measure_callbacks, Optional<Database> database,
             Optional<CostModel> cost_model) final;
