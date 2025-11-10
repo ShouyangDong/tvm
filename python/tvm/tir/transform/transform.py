@@ -1212,3 +1212,61 @@ def UseAssumeToReduceBranches():
         The result pass
     """
     return _ffi_api.UseAssumeToReduceBranches()  # type: ignore
+
+def LowerHopperIntrin():
+    """LowerHopperIntrin
+
+    Returns
+    -------
+    fpass : tvm.transform.Pass
+        The result pass
+    """
+    return (_ffi_api.LowerHopperIntrin() if hasattr(_ffi_api, "LowerHopperIntrin") else lambda f: f
+           )  # type: ignore
+
+
+def WarpSpecializedPipeline():
+    """WarpSpecializedPipeline
+
+    Returns
+    -------
+    fpass : tvm.transform.Pass
+        The result pass
+    """
+    return _ffi_api.WarpSpecializedPipeline()  # type: ignore
+
+
+def RewriteWgmmaSync():
+    """RewriteWgmmaSync
+
+    Returns
+    -------
+    fpass : tvm.transform.Pass
+        The result pass
+    """
+    return _ffi_api.RewriteWgmmaSync()  # type: ignore
+
+def InjectTmaBarrier():
+    """InjectTmaBarrier
+
+    Returns
+    -------
+    fpass : tvm.transform.Pass
+        The result pass
+    """
+    return _ffi_api.InjectTmaBarrier()  # type: ignore
+
+def EliminateStorageSyncForMBarrier():
+    """EliminateStorageSyncForMBarrier
+    """
+    return _ffi_api.EliminateStorageSyncForMBarrier()  # type: ignore
+
+def LowerSharedBarrier():
+    """LowerSharedBarrier
+    """
+    return _ffi_api.LowerSharedBarrier()  # type: ignore
+
+def LowerSharedTmem():
+    """LowerSharedTmem
+    """
+    return _ffi_api.LowerSharedTmem()  # type: ignore
