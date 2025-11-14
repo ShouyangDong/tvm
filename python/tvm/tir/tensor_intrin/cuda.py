@@ -1636,6 +1636,71 @@ def get_mma_store_dummy_intrin(
 
     return mma_store_desc, mma_store_desc
 
+def get_wgmma_intrin_group(
+    load_scope: Literal["shared", "shared.dyn"],
+    store_scope: Literal["global", "shared", "shared.dyn"],
+    in_dtype: str,
+    out_dtype: str,
+    trans_b: bool,
+) -> Dict[str, str]:
+    """Get a group of intrinsics for wgmma tensor core with the given configurations
+
+    Parameters
+    ----------
+    load_scope : Literal["shared", "shared.dyn"]
+        The memory scope of the input buffer.
+
+    store_scope : Literal["global", "shared", "shared.dyn"]
+        The memory scope of the result buffer.
+
+    in_dtype : str
+        The input data type.
+
+    out_dtype : str
+        The output data dtype.
+
+    trans_b : bool
+        Whether the input matrix B is transposed.
+
+    Returns
+    -------
+    ret : Dict[str, str]
+        A group of tensor intrinsics.
+    """
+    assert load_scope in ["shared", "shared.dyn"]
+    assert store_scope in ["global", "shared", "shared.dyn"]
+    assert in_dtype in ["float16", "int8"]
+    assert out_dtype in ["float16", "float32", "int32"]
+
+    shape = "16x16x16"
+    in_dtype = "f16" if in_dtype == "float16" else "s8"
+    out_dtype = "f16" if out_dtype == "float16" else "f32" if out_dtype == "float32" else "s32"
+    # convert "shared.dyn" to "shared_dyn"
+    load_scope = load_scope.replace(".", "_")
+    store_scope = store_scope.replace(".", "_")
+    trans_a = ""
+    trans_b = "_trans" if trans_b else ""
+
+    # e.g. wgmma_load_16x16x16_f16_a_shared
+    load_a_intrin = f"wgmma_load_{shape}_{in_dtype}_a{trans_a}_{load_scope}"
+    # e.g. wgmma_load_16x16x16_f16_b_trans_shared_dyn
+    load_b_intrin = f"wgmma_load_{shape}_{in_dtype}_b{trans_b}_{load_scope}"
+    # e.g. wgmma_sync_16x16x16_f16f16f32_trans
+    compute_intrin = f"wgmma_sync_{shape}_{in_dtype}{in_dtype}{out_dtype}{trans_b}"
+    # e.g. wgmma_fill_16x16x16_f16
+    init_intrin = f"wgmma_fill_{shape}_{out_dtype}"
+    # e.g. wgmma_store_16x16x16_f16_shared_dyn
+    store_intrin = f"wgmma_store_{shape}_{out_dtype}_{store_scope}"
+
+    return {
+        "init": init_intrin,
+        "load_a": load_a_intrin,
+        "load_b": load_b_intrin,
+        "compute": compute_intrin,
+        "store": store_intrin,
+    }
+
+
 
 TensorIntrin.register("mma_init_m16n8k8_f16", *get_mma_init_intrin(16, 8, 8, "float16"))
 TensorIntrin.register("mma_init_m16n8k8_f32", *get_mma_init_intrin(16, 8, 8, "float32"))
