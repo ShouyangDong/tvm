@@ -245,6 +245,40 @@ def detect_buffer_access_lca(func: PrimFunc) -> Dict[Buffer, Stmt]:
     """
     return _ffi_api.detect_buffer_access_lca(func)  # type: ignore # pylint: disable=no-member
 
+def extract_gpu_resource_usage(func: tir.PrimFunc) -> Dict[str, Any]:
+    """Extract actual GPU resource usage from a TIR GPU kernel.
+
+    This function analyzes the given PrimFunc and returns a dictionary containing
+    statistics such as thread block dimensions, shared/local memory consumption,
+    and vector access patterns.
+
+    Parameters
+    ----------
+    func : tvm.tir.PrimFunc
+        The GPU kernel to analyze. Must be lowered to TIR with explicit thread bindings.
+
+    Returns
+    -------
+    result : Dict[str, Any]
+        A dictionary with the following keys (all values are integers or lists of integers):
+
+        - "thread_x", "thread_y", "thread_z": Block dimension sizes.
+        - "threads_per_block": Total number of threads in a block (tx * ty * tz).
+        - "shared_memory_bytes": Total bytes allocated in shared memory.
+        - "local_memory_bytes": Total bytes allocated in local memory.
+        - "num_kernels": Number of GPU kernels launched (usually 1 for a single PrimFunc).
+        - "vector_load_bytes": List of byte widths for vectorized loads (e.g., [16] for float4).
+        - "vector_store_bytes": List of byte widths for vectorized stores.
+
+    Examples
+    --------
+    >>> res = extract_gpu_resource_usage(my_gpu_func)
+    >>> print(res["shared_memory_bytes"])
+    8192
+    >>> print(res["threads_per_block"])
+    256
+    """
+    return _ffi_api.extract_gpu_resource_usage(func) # type: ignore
 
 def estimate_tir_flops(stmt_or_mod: Union[Stmt, IRModule]) -> float:
     """Estimate the FLOPs of a TIR fragment.
