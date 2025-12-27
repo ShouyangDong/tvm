@@ -34,6 +34,7 @@ from . import (
     tir_integration,
     trace_apply,
     XGBgradient,
+    dynamic_gradient_search,
 )
 from .builder import Builder
 from .cost_model import CostModel
