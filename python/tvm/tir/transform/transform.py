@@ -1212,3 +1212,13 @@ def UseAssumeToReduceBranches():
         The result pass
     """
     return _ffi_api.UseAssumeToReduceBranches()  # type: ignore
+
+def HorizontalFusion():
+    """Horizontal fusion in TIR scripts.
+
+    Returns
+    -------
+    fpass : tvm.transform.Pass
+        The result pass
+    """
+    return _ffi_api.HorizontalFusion()  # type: ignore
