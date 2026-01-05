@@ -73,6 +73,7 @@ class HorizontalFuser : public StmtExprMutator {
     thread_tag_var_map_.Set("threadIdx.x", Var("thread_idx_x"));
     thread_tag_var_map_.Set("threadIdx.y", Var("thread_idx_y"));
     thread_tag_var_map_.Set("threadIdx.z", Var("thread_idx_z"));
+    thread_tag_var_map_.Set("vthread.x", Var("vthread_x"));
   }
 
   PrimExpr VisitExpr_(const VarNode* op) final {
