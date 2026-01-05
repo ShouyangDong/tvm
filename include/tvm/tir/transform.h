@@ -156,6 +156,12 @@ TVM_DLL Pass StorageRewrite();
 TVM_DLL Pass UnrollLoop();
 
 /*!
+ * \brief Horizontal fusion pass.
+ * \return The pass.
+ */
+TVM_DLL Pass HorizontalFusion();
+
+/*!
  * \brief Remove No Op from the Stmt.
  *
  * \return The pass.
