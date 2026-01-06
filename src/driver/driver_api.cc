@@ -324,6 +324,8 @@ IRModule ScheduleToModule(te::Schedule sch, const Array<ObjectRef>& args, const 
   if (noalias) {
     f = WithAttr(std::move(f), "tir.noalias", Bool(true));
   }
+
+  f = WithAttr(std::move(f), "horizontal_fuse", Bool(true));
   GlobalVar global_var = global_var_supply->UniqueGlobalFor(name, false);
   return IRModule(Map<GlobalVar, BaseFunc>({{global_var, f}}));
 }
@@ -360,6 +362,10 @@ IRModule LowerPrimFunc(tir::PrimFunc func, const std::string& name, bool simple_
   if (noalias) {
     f = WithAttr(std::move(f), "tir.noalias", Bool(true));
   }
+
+
+  f = WithAttr(std::move(f), "horizontal_fuse", Bool(true));
+ 
   IRModule mod = IRModule(Map<GlobalVar, BaseFunc>({{GlobalVar(name), f}}));
 
   // Get the pass list
