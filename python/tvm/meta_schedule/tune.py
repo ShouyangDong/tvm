@@ -32,6 +32,7 @@ def tune_tasks(
     task_weights: List[float],
     work_dir: str,
     max_trials_global: int,
+    tuning_time: int = 1000000,
     max_trials_per_task: Optional[int] = None,
     num_trials_per_iter: int = 64,
     builder: Builder.BuilderType = "local",
@@ -118,6 +119,7 @@ def tune_tasks(
     task_scheduler.tune(
         tasks=tasks,
         task_weights=task_weights,
+        tuning_time=tuning_time,
         max_trials_global=max_trials_global,
         max_trials_per_task=max_trials_per_task,
         num_trials_per_iter=num_trials_per_iter,
